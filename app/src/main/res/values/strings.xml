@@ -1,0 +1,33 @@
+<resources>
+    <string name="app_name">MiniMillPositionCalc</string>
+    <string name="user_instructions_1">Start by moving the table to your starting position, making sure to end each operation with right rotation of controls.\n\nSet both dial indicators to 0.000</string>
+    <string name="radio_inches_string">Inches</string>
+    <string name="radio_millimeters_string">Millimeters</string>
+    <string name="user_instruction_2">Enter X0 and Y0 with desired starting coordinates, then enter the remaining coordinates.</string>
+    <string name="x0_label">X0</string>
+    <string name="y0_label">Y0</string>
+    <string name="x1_label">X1</string>
+    <string name="y1_label">Y1</string>
+    <string name="x2_label">X2</string>
+    <string name="y2_label">Y2</string>
+    <string name="x3_label">X3</string>
+    <string name="y3_label">Y3</string>
+    <string name="x4_label">X4</string>
+    <string name="y4_label">Y4</string>
+    <string name="x5_label">X5</string>
+    <string name="y5_label">Y5</string>
+    <string name="x6_label">X6</string>
+    <string name="y6_label">Y6</string>
+    <string name="x7_label">X7</string>
+    <string name="y7_label">Y7</string>
+    <string name="x8_label">X8</string>
+    <string name="y8_label">Y8</string>
+    <string name="x9_label">X9</string>
+    <string name="y9_label">Y9</string>
+    <string name="clear_all_label">Clear All</string>
+    <string name="x_not_def">X coordinate is undefined</string>
+    <string name="y_not_def">Y coordinate is undefined</string>
+    <string name="y_coord_undefined">Y coordinate is undefined</string>
+    <string name="x_coord_undefined">X coordinate is undefined</string>
+
+</resources>

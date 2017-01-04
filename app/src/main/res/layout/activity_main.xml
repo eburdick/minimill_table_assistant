@@ -1,0 +1,950 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+Top level is scroll view because the whole app is on a single long page
+-->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <View
+            android:layout_width="10dp"
+            android:layout_height="1dp"
+            android:layout_centerInParent="true"
+            android:id="@+id/horizontal_center"
+            />
+
+        <TextView
+            android:id="@+id/instruction_text1"
+            android:layout_width="wrap_content"
+            android:focusable="false"
+            android:layout_height="wrap_content"
+            android:text="@string/user_instructions_1"
+            android:textSize="@dimen/label_text_size"
+            />
+
+        <RadioGroup
+            android:id="@+id/inch_mm_sel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/instruction_text1"
+            android:orientation="horizontal"
+            android:checkedButton="@+id/inch_sel"
+            >
+
+            <RadioButton
+                android:id="@+id/inch_sel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/radio_inches_string"
+                android:onClick="onRadioButtonClicked"
+                />
+
+            <RadioButton
+                android:id="@+id/mm_sel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/radio_millimeters_string"
+                android:onClick="onRadioButtonClicked"
+                />
+        </RadioGroup>
+
+        <TextView
+            android:id="@+id/instruction_text2"
+            android:layout_width="wrap_content"
+            android:focusable="false"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/inch_mm_sel"
+            android:text="@string/user_instruction_2"
+            android:textSize="@dimen/label_text_size"
+            />
+
+        <Button
+            android:id="@+id/clear_all_button"
+            android:text="@string/clear_all_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/instruction_text2"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:onClick="do_clear_all"
+            />
+
+        <!-- coordinate line 0 -->
+
+        <TextView
+            android:id="@+id/x0_label"
+            android:text="@string/x0_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/clear_all_button"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:textSize="20sp"
+            />
+
+        <EditText
+            android:id="@+id/x0_input"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:inputType="numberSigned|numberDecimal"
+            android:textSize="@dimen/label_text_size"
+            android:layout_toRightOf="@+id/x0_label"
+            android:layout_toEndOf="@+id/x0_label"
+            android:layout_toLeftOf="@id/horizontal_center"
+            android:layout_toStartOf="@id/horizontal_center"
+            android:layout_alignBottom="@id/x0_label"
+            android:background="@color/colorCoordBackground"
+            android:layout_marginLeft="@dimen/coord_line_margins"
+            android:layout_marginStart="@dimen/coord_line_margins"
+            android:nextFocusForward="@+id/y0_input"
+            android:imeOptions="actionNext"
+            />
+
+        <TextView
+            android:id="@+id/y0_label"
+            android:text="@string/y0_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/clear_all_button"
+            android:layout_toRightOf="@id/horizontal_center"
+            android:layout_toEndOf="@id/horizontal_center"
+            android:textSize="20sp"
+            />
+
+        <EditText
+            android:id="@+id/y0_input"
+            android:layout_toRightOf="@id/y0_label"
+            android:layout_toEndOf="@id/y0_label"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:inputType="numberSigned|numberDecimal"
+            android:textSize="@dimen/label_text_size"
+            android:background="@color/colorCoordBackground"
+            android:layout_alignBottom="@id/y0_label"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginLeft="@dimen/coord_line_margins"
+            android:layout_marginStart="@dimen/coord_line_margins"
+            android:nextFocusForward="@+id/x1_input"
+            android:imeOptions="actionDone"
+            />
+
+        <!-- coordinate line 1-->
+
+        <TextView
+            android:id="@+id/x1_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/x1_label"
+            android:textSize="20sp"
+            android:layout_marginTop="5dip"
+            android:layout_below="@+id/x0_label"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            />
+
+        <EditText
+            android:id="@+id/x1_input"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:background="@color/colorCoordBackground"
+            android:textSize="@dimen/label_text_size"
+            android:inputType="numberSigned|numberDecimal"
+            android:layout_toRightOf="@+id/x1_label"
+            android:layout_toEndOf="@+id/x1_label"
+            android:layout_alignBottom="@id/x1_label"
+            android:layout_toLeftOf="@id/horizontal_center"
+            android:layout_toStartOf="@id/horizontal_center"
+            android:layout_marginLeft="@dimen/coord_line_margins"
+            android:layout_marginStart="@dimen/coord_line_margins"
+            android:nextFocusForward="@+id/y1_input"
+            android:imeOptions="actionNext"
+
+            />
+
+        <TextView
+            android:id="@+id/y1_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/y1_label"
+            android:textSize="@dimen/coord_line_text_size"
+            android:layout_alignBottom="@id/x1_label"
+            android:layout_below="@id/x0_label"
+            android:layout_toRightOf="@id/horizontal_center"
+            android:layout_toEndOf="@id/horizontal_center"
+            />
+
+        <EditText
+            android:id="@+id/y1_input"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:inputType="numberSigned|numberDecimal"
+            android:textSize="@dimen/label_text_size"
+            android:background="@color/colorCoordBackground"
+            android:layout_alignBottom="@id/x1_label"
+            android:layout_toRightOf="@+id/y1_label"
+            android:layout_toEndOf="@+id/y1_label"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginLeft="@dimen/coord_line_margins"
+            android:layout_marginStart="@dimen/coord_line_margins"
+            android:nextFocusForward="@+id/x2_input"
+            android:imeOptions="actionDone"
+
+            />
+
+        <!-- user instructions for lines 0 and 1 -->
+
+        <TextView
+            android:id="@+id/user_instruct_x1"
+            android:layout_below="@id/x1_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:textSize="@dimen/label_text_size"
+            android:layout_marginTop="@dimen/coord_line_margins"
+            />
+
+        <TextView
+            android:id="@+id/user_instruct_y1"
+            android:layout_below="@id/user_instruct_x1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:textSize="@dimen/label_text_size"
+            android:layout_marginTop="@dimen/coord_line_margins"
+            />
+
+        <!-- coordinate line 2-->
+
+        <TextView
+            android:id="@+id/x2_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/x2_label"
+            android:textSize="@dimen/coord_text_size"
+            android:layout_marginTop="@dimen/coord_line_margins"
+            android:layout_below="@+id/user_instruct_y1"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            />
+
+        <EditText
+            android:id="@+id/x2_input"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:background="@color/colorCoordBackground"
+            android:textSize="@dimen/label_text_size"
+            android:inputType="numberSigned|numberDecimal"
+            android:layout_alignBottom="@id/x2_label"
+            android:layout_toRightOf="@id/x2_label"
+            android:layout_toEndOf="@id/x2_label"
+            android:layout_toLeftOf="@id/horizontal_center"
+            android:layout_toStartOf="@id/horizontal_center"
+            android:layout_marginLeft="@dimen/coord_line_margins"
+            android:layout_marginStart="@dimen/coord_line_margins"
+            android:nextFocusForward="@+id/y2_input"
+            android:imeOptions="actionNext"
+
+            />
+
+        <TextView
+            android:id="@+id/y2_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/y2_label"
+            android:textSize="@dimen/coord_line_text_size"
+            android:layout_alignBottom="@id/x2_label"
+            android:layout_toRightOf="@id/horizontal_center"
+            android:layout_toEndOf="@id/horizontal_center"
+            />
+
+        <EditText
+            android:id="@+id/y2_input"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:inputType="numberSigned|numberDecimal"
+            android:textSize="@dimen/label_text_size"
+            android:background="@color/colorCoordBackground"
+            android:layout_alignBottom="@id/x2_label"
+            android:layout_toRightOf="@+id/y2_label"
+            android:layout_toEndOf="@+id/y2_label"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginLeft="@dimen/coord_line_margins"
+            android:layout_marginStart="@dimen/coord_line_margins"
+            android:imeOptions="actionDone"
+
+            />
+
+        <!-- user instructions for lines 1 and 2 -->
+
+        <TextView
+            android:id="@+id/user_instruct_x2"
+            android:layout_below="@id/x2_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:textSize="@dimen/label_text_size"
+            android:layout_marginTop="@dimen/coord_line_margins"
+            />
+
+        <TextView
+            android:id="@+id/user_instruct_y2"
+            android:layout_below="@id/user_instruct_x2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:textSize="@dimen/label_text_size"
+            android:layout_marginTop="@dimen/coord_line_margins"
+            />
+
+        <!-- coordinate line 3-->
+
+        <TextView
+            android:id="@+id/x3_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/x3_label"
+            android:textSize="@dimen/coord_text_size"
+            android:layout_marginTop="@dimen/coord_line_margins"
+            android:layout_below="@+id/user_instruct_y2"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            />
+
+        <EditText
+            android:id="@+id/x3_input"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:background="@color/colorCoordBackground"
+            android:textSize="@dimen/label_text_size"
+            android:inputType="numberSigned|numberDecimal"
+            android:layout_alignBottom="@id/x3_label"
+            android:layout_toRightOf="@id/x3_label"
+            android:layout_toEndOf="@id/x3_label"
+            android:layout_toLeftOf="@id/horizontal_center"
+            android:layout_toStartOf="@id/horizontal_center"
+            android:layout_marginLeft="@dimen/coord_line_margins"
+            android:layout_marginStart="@dimen/coord_line_margins"
+            android:nextFocusForward="@+id/y3_input"
+            android:imeOptions="actionNext"
+            />
+
+        <TextView
+            android:id="@+id/y3_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/y3_label"
+            android:textSize="@dimen/coord_line_text_size"
+            android:layout_alignBottom="@id/x3_label"
+            android:layout_toRightOf="@id/horizontal_center"
+            android:layout_toEndOf="@id/horizontal_center"
+            />
+
+        <EditText
+            android:id="@+id/y3_input"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:inputType="numberSigned|numberDecimal"
+            android:textSize="@dimen/label_text_size"
+            android:background="@color/colorCoordBackground"
+            android:layout_alignBottom="@id/x3_label"
+            android:layout_toRightOf="@+id/y3_label"
+            android:layout_toEndOf="@+id/y3_label"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginLeft="@dimen/coord_line_margins"
+            android:layout_marginStart="@dimen/coord_line_margins"
+            android:imeOptions="actionDone"
+            />
+
+        <!-- user instructions for lines 2 and 3 -->
+
+        <TextView
+            android:id="@+id/user_instruct_x3"
+            android:layout_below="@id/x3_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:textSize="@dimen/label_text_size"
+            android:layout_marginTop="@dimen/coord_line_margins"
+            />
+
+        <TextView
+            android:id="@+id/user_instruct_y3"
+            android:layout_below="@id/user_instruct_x3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:textSize="@dimen/label_text_size"
+            android:layout_marginTop="@dimen/coord_line_margins"
+            />
+
+        <!-- coordinate line 4 -->
+
+        <TextView
+            android:id="@+id/x4_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/x4_label"
+            android:textSize="@dimen/coord_text_size"
+            android:layout_marginTop="@dimen/coord_line_margins"
+            android:layout_below="@+id/user_instruct_y3"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            />
+
+        <EditText
+            android:id="@+id/x4_input"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:background="@color/colorCoordBackground"
+            android:textSize="@dimen/label_text_size"
+            android:inputType="numberSigned|numberDecimal"
+            android:layout_alignBottom="@id/x4_label"
+            android:layout_toRightOf="@id/x4_label"
+            android:layout_toEndOf="@id/x4_label"
+            android:layout_toLeftOf="@id/horizontal_center"
+            android:layout_toStartOf="@id/horizontal_center"
+            android:layout_marginLeft="@dimen/coord_line_margins"
+            android:layout_marginStart="@dimen/coord_line_margins"
+            android:nextFocusForward="@+id/y4_input"
+            android:imeOptions="actionNext"
+            />
+
+        <TextView
+            android:id="@+id/y4_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/y4_label"
+            android:textSize="@dimen/coord_line_text_size"
+            android:layout_alignBottom="@id/x4_label"
+            android:layout_toRightOf="@id/horizontal_center"
+            android:layout_toEndOf="@id/horizontal_center"
+            />
+
+        <EditText
+            android:id="@+id/y4_input"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:inputType="numberSigned|numberDecimal"
+            android:textSize="@dimen/label_text_size"
+            android:background="@color/colorCoordBackground"
+            android:layout_alignBottom="@id/x4_label"
+            android:layout_toRightOf="@+id/y4_label"
+            android:layout_toEndOf="@+id/y4_label"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginLeft="@dimen/coord_line_margins"
+            android:layout_marginStart="@dimen/coord_line_margins"
+            android:imeOptions="actionDone"
+            />
+
+        <!-- user instructions for lines 3 and 4 -->
+
+        <TextView
+            android:id="@+id/user_instruct_x4"
+            android:layout_below="@id/x4_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:textSize="@dimen/label_text_size"
+            android:layout_marginTop="@dimen/coord_line_margins"
+            />
+
+        <TextView
+            android:id="@+id/user_instruct_y4"
+            android:layout_below="@id/user_instruct_x4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:textSize="@dimen/label_text_size"
+            android:layout_marginTop="@dimen/coord_line_margins"
+            />
+        <!-- coordinate line 5-->
+
+        <TextView
+            android:id="@+id/x5_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/x5_label"
+            android:textSize="@dimen/coord_text_size"
+            android:layout_marginTop="@dimen/coord_line_margins"
+            android:layout_below="@+id/user_instruct_y4"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            />
+
+        <EditText
+            android:id="@+id/x5_input"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:background="@color/colorCoordBackground"
+            android:textSize="@dimen/label_text_size"
+            android:inputType="numberSigned|numberDecimal"
+            android:layout_alignBottom="@id/x5_label"
+            android:layout_toRightOf="@id/x5_label"
+            android:layout_toEndOf="@id/x5_label"
+            android:layout_toLeftOf="@id/horizontal_center"
+            android:layout_toStartOf="@id/horizontal_center"
+            android:layout_marginLeft="@dimen/coord_line_margins"
+            android:layout_marginStart="@dimen/coord_line_margins"
+            android:nextFocusForward="@+id/y5_input"
+            android:imeOptions="actionNext"
+
+            />
+
+        <TextView
+            android:id="@+id/y5_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/y5_label"
+            android:textSize="@dimen/coord_line_text_size"
+            android:layout_alignBottom="@id/x5_label"
+            android:layout_toRightOf="@id/horizontal_center"
+            android:layout_toEndOf="@id/horizontal_center"
+            />
+
+        <EditText
+            android:id="@+id/y5_input"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:inputType="numberSigned|numberDecimal"
+            android:textSize="@dimen/label_text_size"
+            android:background="@color/colorCoordBackground"
+            android:layout_alignBottom="@id/x5_label"
+            android:layout_toRightOf="@+id/y5_label"
+            android:layout_toEndOf="@+id/y5_label"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginLeft="@dimen/coord_line_margins"
+            android:layout_marginStart="@dimen/coord_line_margins"
+            android:imeOptions="actionDone"
+
+            />
+
+        <!-- user instructions for lines 4 and 5 -->
+
+        <TextView
+            android:id="@+id/user_instruct_x5"
+            android:layout_below="@id/x5_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:textSize="@dimen/label_text_size"
+            android:layout_marginTop="@dimen/coord_line_margins"
+            />
+
+        <TextView
+            android:id="@+id/user_instruct_y5"
+            android:layout_below="@id/user_instruct_x5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:textSize="@dimen/label_text_size"
+            android:layout_marginTop="@dimen/coord_line_margins"
+            />
+
+        <!-- coordinate line 6-->
+
+        <TextView
+            android:id="@+id/x6_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/x6_label"
+            android:textSize="@dimen/coord_text_size"
+            android:layout_marginTop="@dimen/coord_line_margins"
+            android:layout_below="@+id/user_instruct_y5"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            />
+
+        <EditText
+            android:id="@+id/x6_input"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:background="@color/colorCoordBackground"
+            android:textSize="@dimen/label_text_size"
+            android:inputType="numberSigned|numberDecimal"
+            android:layout_alignBottom="@id/x6_label"
+            android:layout_toRightOf="@id/x6_label"
+            android:layout_toEndOf="@id/x6_label"
+            android:layout_toLeftOf="@id/horizontal_center"
+            android:layout_toStartOf="@id/horizontal_center"
+            android:layout_marginLeft="@dimen/coord_line_margins"
+            android:layout_marginStart="@dimen/coord_line_margins"
+            android:nextFocusForward="@+id/y6_input"
+            android:imeOptions="actionNext"
+
+            />
+
+        <TextView
+            android:id="@+id/y6_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/y6_label"
+            android:textSize="@dimen/coord_line_text_size"
+            android:layout_alignBottom="@id/x6_label"
+            android:layout_toRightOf="@id/horizontal_center"
+            android:layout_toEndOf="@id/horizontal_center"
+            />
+
+        <EditText
+            android:id="@+id/y6_input"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:inputType="numberSigned|numberDecimal"
+            android:textSize="@dimen/label_text_size"
+            android:background="@color/colorCoordBackground"
+            android:layout_alignBottom="@id/x6_label"
+            android:layout_toRightOf="@+id/y6_label"
+            android:layout_toEndOf="@+id/y6_label"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginLeft="@dimen/coord_line_margins"
+            android:layout_marginStart="@dimen/coord_line_margins"
+            android:imeOptions="actionDone"
+
+            />
+
+        <!-- user instructions for lines 5 and 6 -->
+
+        <TextView
+            android:id="@+id/user_instruct_x6"
+            android:layout_below="@id/x6_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:textSize="@dimen/label_text_size"
+            android:layout_marginTop="@dimen/coord_line_margins"
+            />
+
+        <TextView
+            android:id="@+id/user_instruct_y6"
+            android:layout_below="@id/user_instruct_x6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:textSize="@dimen/label_text_size"
+            android:layout_marginTop="@dimen/coord_line_margins"
+            />
+
+        <!-- coordinate line 7-->
+
+        <TextView
+            android:id="@+id/x7_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/x7_label"
+            android:textSize="@dimen/coord_text_size"
+            android:layout_marginTop="@dimen/coord_line_margins"
+            android:layout_below="@+id/user_instruct_y6"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            />
+
+        <EditText
+            android:id="@+id/x7_input"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:background="@color/colorCoordBackground"
+            android:textSize="@dimen/label_text_size"
+            android:inputType="numberSigned|numberDecimal"
+            android:layout_alignBottom="@id/x7_label"
+            android:layout_toRightOf="@id/x7_label"
+            android:layout_toEndOf="@id/x7_label"
+            android:layout_toLeftOf="@id/horizontal_center"
+            android:layout_toStartOf="@id/horizontal_center"
+            android:layout_marginLeft="@dimen/coord_line_margins"
+            android:layout_marginStart="@dimen/coord_line_margins"
+            android:nextFocusForward="@+id/y7_input"
+            android:imeOptions="actionNext"
+
+            />
+
+        <TextView
+            android:id="@+id/y7_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/y7_label"
+            android:textSize="@dimen/coord_line_text_size"
+            android:layout_alignBottom="@id/x7_label"
+            android:layout_toRightOf="@id/horizontal_center"
+            android:layout_toEndOf="@id/horizontal_center"
+            />
+
+        <EditText
+            android:id="@+id/y7_input"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:inputType="numberSigned|numberDecimal"
+            android:textSize="@dimen/label_text_size"
+            android:background="@color/colorCoordBackground"
+            android:layout_alignBottom="@id/x7_label"
+            android:layout_toRightOf="@+id/y7_label"
+            android:layout_toEndOf="@+id/y7_label"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginLeft="@dimen/coord_line_margins"
+            android:layout_marginStart="@dimen/coord_line_margins"
+            android:imeOptions="actionDone"
+
+            />
+
+        <!-- user instructions for lines 6 and 7 -->
+
+        <TextView
+            android:id="@+id/user_instruct_x7"
+            android:layout_below="@id/x7_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:textSize="@dimen/label_text_size"
+            android:layout_marginTop="@dimen/coord_line_margins"
+            />
+
+        <TextView
+            android:id="@+id/user_instruct_y7"
+            android:layout_below="@id/user_instruct_x7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:textSize="@dimen/label_text_size"
+            android:layout_marginTop="@dimen/coord_line_margins"
+            />
+
+        <!-- coordinate line 8-->
+
+        <TextView
+            android:id="@+id/x8_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/x8_label"
+            android:textSize="@dimen/coord_text_size"
+            android:layout_marginTop="@dimen/coord_line_margins"
+            android:layout_below="@+id/user_instruct_y7"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            />
+
+        <EditText
+            android:id="@+id/x8_input"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:background="@color/colorCoordBackground"
+            android:textSize="@dimen/label_text_size"
+            android:inputType="numberSigned|numberDecimal"
+            android:layout_alignBottom="@id/x8_label"
+            android:layout_toRightOf="@id/x8_label"
+            android:layout_toEndOf="@id/x8_label"
+            android:layout_toLeftOf="@id/horizontal_center"
+            android:layout_toStartOf="@id/horizontal_center"
+            android:layout_marginLeft="@dimen/coord_line_margins"
+            android:layout_marginStart="@dimen/coord_line_margins"
+            android:nextFocusForward="@+id/y8_input"
+            android:imeOptions="actionNext"
+
+            />
+
+        <TextView
+            android:id="@+id/y8_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/y8_label"
+            android:textSize="@dimen/coord_line_text_size"
+            android:layout_alignBottom="@id/x8_label"
+            android:layout_toRightOf="@id/horizontal_center"
+            android:layout_toEndOf="@id/horizontal_center"
+            />
+
+        <EditText
+            android:id="@+id/y8_input"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:inputType="numberSigned|numberDecimal"
+            android:textSize="@dimen/label_text_size"
+            android:background="@color/colorCoordBackground"
+            android:layout_alignBottom="@id/x8_label"
+            android:layout_toRightOf="@+id/y8_label"
+            android:layout_toEndOf="@+id/y8_label"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginLeft="@dimen/coord_line_margins"
+            android:layout_marginStart="@dimen/coord_line_margins"
+            android:imeOptions="actionDone"
+
+            />
+
+        <!-- user instructions for lines 7 and 8 -->
+
+        <TextView
+            android:id="@+id/user_instruct_x8"
+            android:layout_below="@id/x8_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:textSize="@dimen/label_text_size"
+            android:layout_marginTop="@dimen/coord_line_margins"
+            />
+
+        <TextView
+            android:id="@+id/user_instruct_y8"
+            android:layout_below="@id/user_instruct_x8"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:textSize="@dimen/label_text_size"
+            android:layout_marginTop="@dimen/coord_line_margins"
+            />
+        <!-- coordinate line 9-->
+
+        <TextView
+            android:id="@+id/x9_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/x9_label"
+            android:textSize="@dimen/coord_text_size"
+            android:layout_marginTop="@dimen/coord_line_margins"
+            android:layout_below="@+id/user_instruct_y8"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            />
+
+        <EditText
+            android:id="@+id/x9_input"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:background="@color/colorCoordBackground"
+            android:textSize="@dimen/label_text_size"
+            android:inputType="numberSigned|numberDecimal"
+            android:layout_alignBottom="@id/x9_label"
+            android:layout_toRightOf="@id/x9_label"
+            android:layout_toEndOf="@id/x9_label"
+            android:layout_toLeftOf="@id/horizontal_center"
+            android:layout_toStartOf="@id/horizontal_center"
+            android:layout_marginLeft="@dimen/coord_line_margins"
+            android:layout_marginStart="@dimen/coord_line_margins"
+            android:nextFocusForward="@+id/y9_input"
+            android:imeOptions="actionNext"
+
+            />
+
+        <TextView
+            android:id="@+id/y9_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/y9_label"
+            android:textSize="@dimen/coord_line_text_size"
+            android:layout_alignBottom="@id/x9_label"
+            android:layout_toRightOf="@id/horizontal_center"
+            android:layout_toEndOf="@id/horizontal_center"
+            />
+
+        <EditText
+            android:id="@+id/y9_input"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:inputType="numberSigned|numberDecimal"
+            android:textSize="@dimen/label_text_size"
+            android:background="@color/colorCoordBackground"
+            android:layout_alignBottom="@id/x9_label"
+            android:layout_toRightOf="@+id/y9_label"
+            android:layout_toEndOf="@+id/y9_label"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginLeft="@dimen/coord_line_margins"
+            android:layout_marginStart="@dimen/coord_line_margins"
+            android:imeOptions="actionDone"
+
+            />
+
+        <!-- user instructions for lines 8 and 9 -->
+
+        <TextView
+            android:id="@+id/user_instruct_x9"
+            android:layout_below="@id/x9_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:textSize="@dimen/label_text_size"
+            android:layout_marginTop="@dimen/coord_line_margins"
+            />
+
+        <TextView
+            android:id="@+id/user_instruct_y9"
+            android:layout_below="@id/user_instruct_x9"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:textSize="@dimen/label_text_size"
+            android:layout_marginTop="@dimen/coord_line_margins"
+            />
+
+    </RelativeLayout>
+</ScrollView>
