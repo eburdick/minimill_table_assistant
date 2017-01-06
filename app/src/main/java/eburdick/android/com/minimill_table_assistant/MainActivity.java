@@ -124,6 +124,8 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.Locale;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -132,7 +134,13 @@ public class MainActivity extends AppCompatActivity {
     // Constants
     //
     final int NUMCOORDS = 10;
-    final BigDecimal MMPERINCH = new BigDecimal("25.4");
+    //Inches per millimeter is a long unrepeating decimal value. This is close enough
+    //(within a very small fraction of a MM) and makes the decimal arithmetic behave well
+    final BigDecimal INCHPERMM = new BigDecimal(".03937");
+    // We are dealing with coordinates less than half a meter, so the biggest might be
+    // 500 millimeters. We code an undefined coordinate field by setting it to 1,000,000.
+    final BigDecimal uninitflag = new BigDecimal(1000000.0);
+
 
     //
     // Declare working arrays as instance variables so they are accessible throughout
@@ -143,7 +151,6 @@ public class MainActivity extends AppCompatActivity {
     TextView[] user_instrx; //X user instruction widgets
     TextView[] user_instry; //y user instruction widgets
     boolean inch_units;    //if true, user coordinates are inches, else millimeters
-    double dialx, dialy;     //the running dial values for the x and y controls.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -279,11 +286,6 @@ public class MainActivity extends AppCompatActivity {
             });
         } // for loop
 
-        //
-        // Initialize the running dialx and dialy values to zero
-        //
-        dialx = 0.0;
-        dialy = 0.0;
 
         //
         // Set the user interface to its empty initial state
@@ -346,7 +348,9 @@ public class MainActivity extends AppCompatActivity {
         }
         do_calculate();
     }
-
+    //
+    //----------------------------------do_clear_all-------------------------------------
+    //
     public void do_clear_all(View view)
     {
         //
@@ -361,9 +365,26 @@ public class MainActivity extends AppCompatActivity {
             coordx_widget[i].setText("");
             coordy_widget[i].setText("");
         }
+
+
+        //
+        // Set the inch radio button to checked
+        //
+        RadioButton inch_button = (RadioButton) findViewById(R.id.inch_sel);
+        inch_button.setChecked(true);
+        inch_units = inch_button.isChecked();
+        //
+        // synchronize the app by running calculata on the cleared user interface
+        //
         do_calculate();
     }
+    //
+    // end do_clear_all
+    //
 
+    //
+    //---------------------------------do_calculate-------------------------------------
+    //
     public void do_calculate()
     {
 
@@ -373,9 +394,19 @@ public class MainActivity extends AppCompatActivity {
         // method is called whenever the state of the user interface changes, including the
         // setting of the inches/millimeters radio group or the value of any of the coordinate
         // fields.  It is also called by do_clear_all() after it clears the coordinate fields.
-        // This method sequentially calls the calcStepsAndDial() method for each pair of
-        // coordinates X[n] -> X[n+1] and Y[n] -> Y[n+1].  That method calculates required
-        // user operations for each motion and updates the incremental dial position.
+        //
+        // Summary:
+        //   * Set the scale factor: 1 for inputs in inches, INCHPERMM for inputs in MM.
+        //   * Parse each coordinate field and write it to the corresponding array element,
+        //     processing as follows:
+        //     - check that it is correct number syntax.  If not, mark it as unitialized and
+        //       write a null string back to the input widget
+        //     - round to nearest .0005 and write the rounded value back to the widget and to
+        //       the corresponding array element
+        //   * initialize dialx and dialy to 0.000
+        //   * Starting at n = 0, call CalcStepsAndDial for Xn->Xn+1 and Yn->Yn+1 to get the
+        //     user instruction for that motion and update the running dialx and dialy values.
+        //     Display the user instruction in the user interface.
         //
         // Declare coordinate arrays as BigDecimal.
         //
@@ -384,34 +415,11 @@ public class MainActivity extends AppCompatActivity {
         BigDecimal scale_factor;
         BigDecimal uninitflag = new BigDecimal(1000000.0); //indicates no user entry
         String temp_coord_string;
-        int index;
         //
-        // Get the coordinate values from the widgets. If the coordinate value string is
-        // null, then set the value to uninitflag;
-        //
-        for (index=0; index<NUMCOORDS; index++)
-        {
-            temp_coord_string = coordx_widget[index].getText().toString();
-            if (temp_coord_string.equals(""))
-            {
-                xcoord[index] = uninitflag;
-            }
-            else
-            {
-                xcoord[index] = roundToHalfThousanth(new BigDecimal(temp_coord_string));
-            }
-            temp_coord_string = coordy_widget[index].getText().toString();
-            if (temp_coord_string.equals(""))
-            {
-                ycoord[index] = uninitflag;
-            }
-            else
-            {
-                ycoord[index] = roundToHalfThousanth(new BigDecimal(temp_coord_string));
-            }
-        }
-        //
-        // Set scale factor based on the inch_units flag
+        // Set scale factor based on the inch_units flag, which reflects the state of the
+        // inches/millimeters radio group. If it is false, then we are going
+        // to interprete the coordinates as millimeters and convert to inches for machine
+        // operations.
         //
         if(inch_units)
         {
@@ -419,88 +427,219 @@ public class MainActivity extends AppCompatActivity {
         }
         else
         {
-            scale_factor = MMPERINCH;
+            scale_factor = INCHPERMM;
         }
 
         //
+        // Load the coorinate arrays from the coordinate EditText fields. For each text
+        // string retrieved, check that it is a valid decimal value. This is done by comparing
+        // against a regular expression that defines one of these two patterns:
+        //   optional "-", then one or more digits followed optionally by "." and zero or more digits
+        //   optional "-",then "." followed by one or more digits
+        // If the string does not match one of these patterns, it is not a valid number, and we
+        // set the value to uninitflag, which signals the calculate code that it cannot be used
+        // in any calculations.
         //
+        // set pattern definition string and compile it into a pattern
         //
+        String num_regex = "^-?\\d+(\\.\\d*)?$|^-?\\.\\d+$"; // pattern described above
+        Pattern decimal_number_pattern = Pattern.compile(num_regex);
+        Matcher matcher;
+
+        for (int index=0; index<NUMCOORDS; index++)
+        {
+            //Get the coordinate string from the coordinate widget
+            temp_coord_string = coordx_widget[index].getText().toString();
+            //set a matcher from the compiled pattern and the coordinate string
+            matcher = decimal_number_pattern.matcher(temp_coord_string);
+
+            //run the matcher's find method. If it returns false then the coordinate string
+            //does not match the pattern for a decimal number, and we set the value to
+            // the uninitialized flag.  Else, we create a new value for the coordinate, rounded
+            // to half a thousanth of an inch.
+            if (matcher.find())
+            {
+                //coordinate text matches the pattern
+                xcoord[index] = roundToHalfThousanth(new BigDecimal(temp_coord_string));
+            }
+            else
+            {   //coordinate text does not match the pattern
+                xcoord[index] = uninitflag;
+            }
+            //
+            //repeat for y coordinate
+            //
+            temp_coord_string = coordy_widget[index].getText().toString();
+            matcher = decimal_number_pattern.matcher(temp_coord_string);
+            if (matcher.find())
+            {
+                ycoord[index] = roundToHalfThousanth(new BigDecimal(temp_coord_string));
+            }
+            else
+            {
+                ycoord[index] = uninitflag;
+            }
+        }
+
         //
-        // For each coordinate, write the rounded value back to the input field. For adjacent
-        // coordinates, eg x0, x1, call
-        //    CalcStepsAndDial(starting_pos, next_pos, coord_label, scale_factor)
+        // For each coordinate, write the rounded value back to the input field. This is to let
+        // the user know what numbers are actually being used.
+        //
+        for (int index=0; index<NUMCOORDS; index++)
+        {
+            if (xcoord[index].equals(uninitflag))
+            {
+                //field is not a valid number, so write null string
+                coordx_widget[index].setText("");
+            }
+            else
+            {
+                coordx_widget[index].setText(String.format(Locale.US, "%1$06.4f", xcoord[index]));
+            }
+            if (ycoord[index].equals(uninitflag))
+            {
+                coordy_widget[index].setText("");
+            }
+            else
+            {
+                coordy_widget[index].setText(String.format(Locale.US, "%1$06.4f", ycoord[index]));
+            }
+
+        }
+        // For each pair of coordinates Xn, Xn+1 and Yn, Yn+1, call the method
+        //   CalcStepsAndDial(starting_pos, next_pos, coord_label, scale_factor)
         // This will return the user instruction to be written to the corresponding
-        // user_instrx or user_instry. As a side effect, it will also update the instance
-        // variable dialx or dialy.
+        // user_instrx or user_instry for moving the table from position n to position n+1.
+        // Each instruction will end with a dial value, which is saved in instance variables
+        // dialx and dialy during execution of this method and used for the next call after n
         //
-
-        // Write back the rounded value of x0 and y0 to the coordinate widgets.
-        if (!xcoord[0].equals(uninitflag))
+        BigDecimal dialx = BigDecimal.ZERO;
+        BigDecimal dialy = BigDecimal.ZERO;
+        for (int index=0; index<NUMCOORDS-1; index++)
         {
-            coordx_widget[0].setText(String.format(Locale.US,"%1$06.4f",xcoord[0]));
+            InstrAndDial xresult =
+                     CalcStepsAndDial(xcoord[index],xcoord[index+1],"X",scale_factor,dialx);
+            String user_instr_stringx = xresult.getUserInstruct();
+            dialx = xresult.getDial();
+            user_instrx[index].setText(user_instr_stringx);
+
+            InstrAndDial yresult =
+                    CalcStepsAndDial(ycoord[index],ycoord[index+1],"Y",scale_factor,dialy);
+            String user_instr_stringy = yresult.getUserInstruct();
+            dialy = yresult.getDial();
+            user_instry[index].setText(user_instr_stringy);
         }
-        if (!ycoord[0].equals(uninitflag))
-        {
-            coordy_widget[0].setText(String.format(Locale.US, "%1$06.4f", ycoord[0]));
-        }
-
-        //
-        // note this for loop is for writing to the user_instruction arrays, which are
-        // one smaller than the coordinate array.  Coordinates are indexed one higher than
-        // user instructions.
-        //
-        for (index=0; index<NUMCOORDS-1; index++)
-        {
-            //
-            // Write back the rounded values of the x and y coordinate to the corresponding
-            // coordinate input widgets.
-            //
-            // temporary for test: write the coordinates to the corresponding user instruction
-            // text widgets
-            //
-            if (xcoord[index+1].equals(uninitflag))
-            {
-                // temp for test: user instruction: x coordinate undefined
-                user_instrx[index].setText(R.string.x_coord_undefined);
-            }
-            else
-            {
-                //write back rounded coordinate
-                coordx_widget[index+1].setText(String.format(Locale.US,"%1$06.4f",xcoord[index+1]));
-
-                //temp for test: user instruction for index,index+1 is xcoord[index+1]
-                user_instrx[index].setText(String.format(Locale.US,"X coordinate is %1$06.4f",xcoord[index+1]));
-
-            }
-            if (ycoord[index+1].equals(uninitflag))
-            {
-                user_instry[index].setText(R.string.y_coord_undefined);
-            }
-            else
-            {
-                coordy_widget[index+1].setText(String.format(Locale.US,"%1$06.4f",ycoord[index+1]));
-
-                user_instry[index].setText(String.format(Locale.US,"Y coordinate is %1$06.4f",ycoord[index+1]));
-            }
-
-        }
-
     }
 
-    public String CalcStepsAndDial(BigDecimal starting_pos, BigDecimal next_pos, String coord_label, BigDecimal scale_factor)
+    //
+    // -----------------------------------CalcStepsAndDial---------------------------------
+    //
+    public InstrAndDial CalcStepsAndDial
+            (BigDecimal starting_pos,       // position before the move
+             BigDecimal next_pos,           // target position after the move
+             String coord_label,            //"X" or "Y"
+             BigDecimal scale_factor,       // 1 or inches, INCHPERMM for millimeters
+             BigDecimal dial_val)           // Current setting on the target table control
     {
+        // This method takes the current position and new position in X or Y and calculates what
+        // user operations are required to get to the new position. To keep things straightforward
+        // for the user and compensate for machine backlash, we follow the following guidelines...
         //
-        // check if starting_pos or next_pos is undefined. If so, nothing can be done from here on.
+        // 1. All final control rotations are done with right turns. This is to avoid forcing the
+        // user to remember the direction.  Assumption: the machine table moves in a positive
+        // direction for both X and Y motion with clockwise (rightward) control rotation. We use
+        // the language right and left instead of clockwise and counterclockwise because a lot of
+        // younger students have trouble with the clock terms.
+        //
+        // 2. All full control turns are done from and to 0 on the dial. This avoids having to
+        // remember the dial setting while executing full turns with the control. Consistent with
+        // this, the dial setting for the initial position (X0, Y0) is always 0, 0.
+        //
+        // 3. All motions in the negative direction (left control turns) are overshot a full
+        // control turn and then finished with rotation to the right. This eliminates up to a
+        // full turn of backlash. (backlash is typically 10% to 30% of a turn)
+        //
+        // Example: We want to move the table from 0 to -.0525. Dial position for this is going
+        // to be .0625 - .0525 = .01. With no backlash, this would just be a left turn directly
+        // to .01, but assuming backlash is .025, this would not work.  As shown below, if we turn
+        // the dial left to zero, the table moves to -.035, which is not far enough.  Another full
+        // turn to the left, followed by a full turn to the right gets the table to
+        // -.0625 (dial = 0) and a further turn to .01 gets us to the target position.
+        //
+        //                                                                       |<--full turn-->|
+        //                                                                         .01
+        // dial value (^)           -------------0---------------0---------------0--^------------0
+        // table position (|)                 -.1875          -.125          -.0625 |            0
+        // starting dial position                                                                ^
+        // starting table position                                                               |
+        // rotate left directly to .01 fails to work                                ^
+        //   (table only starts moving after backlash)                              `----|
+        // instead, rotate left to 0                                             ^
+        //   (table still not at target position)                                `----|
+        // rotate left full turn                                 ^
+        //   (table passes target position)                      `----|
+        // rotate right full turn                                                ^
+        //   (backlash erased due to right turn > .025)                          |
+        // rotate right to .01                                                      ^
+        //   (table in target position)                                             |
+        //
+        // Note: distances are calculated in the BigDecimal type, which results in exact
+        // decimal values.  This avoids error prone complex behaviors caused by doing
+        // calculations in floating point and having bits set toward the least significant
+        // bits of the mantissa.  Because BigDecimal is not a primitive number in the
+        // Java language, arithmetic expressions take the form, operand1.function(operand2)
+        // instead of the familiar infix operators like +, -, and *. A key issue with
+        // BigDecimal is that if the result of an operation is not exact in decimal, ie
+        // it is an infinite sequence of digits, an exception is thrown.  Rather than deal with
+        // arithmetic exceptions, this code avoids it by not doing operations that can have such a
+        // result.
+        //
+        // Local variables
+        BigDecimal raw_offset; // direction and distance to move the table -- in inches
+        //
+        // check if starting_pos or next_pos is undefined. If so, no calculation is done and
+        // we return a message to the user. Otherwise, calculate the raw table offset number,
+        // which is (start - next)*scale_factor.
+        //
+        if (starting_pos.equals(uninitflag) | next_pos.equals(uninitflag))
+        {
+            return new InstrAndDial("Missing coordinate; no user action",dial_val);
+        }
+        else
+        {
+            raw_offset = next_pos.subtract(starting_pos).multiply(scale_factor);
+        }
+
+        //
+        // At this point, we have a valid raw_offset, and can calculate what the user needs
+        // to do to move the table that direction/distance. There are three major cases: positive
+        // motion, zero motion and negative motion.
         //
 
         //
-        // Calculate offset and divide by scale_factor
+        // Zero motion case: no user action, dial stays the same.
         //
+        if (raw_offset.equals(BigDecimal.ZERO))
+        {
+            return
+                    new InstrAndDial(String.format
+                            (Locale.US,"%1$s unchanged. Leave %1$S control alone", coord_label),
+                            dial_val);
+        }
 
-        return ("foo, just to make compile run");
 
 
+
+        // temporary test return
+        return new InstrAndDial(String.format(Locale.US,"offset is %1$06.10f",raw_offset),dial_val);
     }
+    //
+    // end CalcStepAndDial
+    //
+
+    //
+    //-----------------------------------roundToHalfThouasanth---------------------------
+    //
     public BigDecimal roundToHalfThousanth(BigDecimal value)
     {
         //round a number to a half a thousanth. Fourth decimal place will be either 0 or 5.
@@ -530,5 +669,38 @@ public class MainActivity extends AppCompatActivity {
         return two_thousand.multiply(value).setScale(0, RoundingMode.HALF_UP).divide(two_thousand);
 
     }
+    //
+    // end roundToHalfThousanth
+    //
+}
+//
+// end of public class MainActivity
+//
 
-} // end of public class MainActivity
+//
+// class for returning a string and a BigDecimal for calculation steps
+//
+final class InstrAndDial {
+    private final String UserInstruct;
+    private final BigDecimal dial;
+    //
+    // Constructor
+    //
+    public InstrAndDial(String UserInstruct, BigDecimal dial)
+    {
+        this.UserInstruct = UserInstruct;
+        this.dial = dial;
+    }
+    //
+    // Field access methods
+    //
+    public String getUserInstruct()
+    {
+        return UserInstruct;
+    }
+
+    public BigDecimal getDial()
+    {
+        return dial;
+    }
+}
